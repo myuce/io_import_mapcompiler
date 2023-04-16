@@ -8,6 +8,8 @@ from math import sqrt
 from .formats.Map import Map
 from .formats.Brush import Brush
 from .formats.Patch import Patch
+from .formats.Helpers import newPath
+import os
 
 bl_info = {
     "name": "mapcompiler",
@@ -33,11 +35,45 @@ class ImportMap(Operator, ImportHelper):
         maxlen=1024,  # Max internal buffer length, longer would be clamped.
     )
 
+    game_path: StringProperty(
+        name="Game Path",
+        default="C:/stuff/games/other/q3a/baseq3",
+        maxlen=1024
+    )
+
     # List of operator properties, the attributes will be assigned
     # to the class instance from the operator settings before calling.
 
     def execute(self, context):
         mapData = Map.Load(self.filepath)
+
+        extensions = ["tga", "jpg", "png"]
+        for material in mapData.materials:
+            matName = newPath(material)
+            file = None
+            for ext in extensions:
+                if os.path.exists(f"{self.game_path}/textures/{material}.{ext}"):
+                    file = f"{self.game_path}/textures/{material}.{ext}"
+                    break
+            
+            if file is None:
+                print(f"Can't find material {material}")
+                continue
+            
+            material = bpy.data.materials.new(name=matName)
+            material.use_nodes = True
+            nodes = material.node_tree.nodes
+
+            for node in nodes:
+                nodes.remove(node)
+
+            tex_node = nodes.new(type="ShaderNodeTexImage")
+            tex_node.image = bpy.data.images.load(file)
+            diffuse_node = nodes.new(type="ShaderNodeBsdfDiffuse")
+            output_node = nodes.new(type="ShaderNodeOutputMaterial")
+            links = material.node_tree.links
+            links.new(tex_node.outputs["Color"], diffuse_node.inputs["Color"])
+            links.new(diffuse_node.outputs["BSDF"], output_node.inputs["Surface"])
 
         for i, entity in enumerate(mapData.entities):
             classname = entity["classname"]
@@ -67,8 +103,8 @@ class ImportMap(Operator, ImportHelper):
                             mesh_data = bpy.data.meshes.new(f"{classname}_{i}_geo_{j}_{k}_data")
 
                             verts = [vert * 0.0254 for vert in face.GetVerts()]
-
                             idx = [i for i in range(len(verts))]
+
                             normal = face.GetNormal()
 
                             mesh_data.from_pydata(verts, [], [idx])
@@ -78,7 +114,31 @@ class ImportMap(Operator, ImportHelper):
                             mesh_data.update()
 
                             mesh_obj = bpy.data.objects.new(name=f"{classname}_{i}_geo_{j}_{k}", object_data=mesh_data)
+
+                            matName = newPath(face.material)
+                            if matName in bpy.data.materials:
+                                material = bpy.data.materials[newPath(face.material)]
+                                mesh_obj.data.materials.append(material)
+                                face.texSize = Vector(material.node_tree.nodes["Image Texture"].image.size)
+
+                            face.CalculateUVs()
+                            face.CalculateLightmapUVs()
+                            uvs = [Vector((uv.x, -uv.y)) for uv in face.GetUVs()]
+                            lightmap_uvs = [Vector((uv.x, -uv.y)) for uv in face.lightmapUVs]
+                            uv_layer = mesh_data.uv_layers.new(name="TextureUV")
+                            lm_layer = mesh_data.uv_layers.new(name="LightmapUV")
+                            
+                            for loop in mesh_data.loops:
+                                vertex_index = loop.vertex_index
+                                uv_layer.data[loop.index].uv = uvs[vertex_index]
+                                lm_layer.data[loop.index].uv = lightmap_uvs[vertex_index]
+                            
+                            mesh_obj.data.uv_layers.active = uv_layer
+
                             bpy.context.scene.collection.objects.link(mesh_obj)
+                    elif isinstance(geo, Patch):
+                        pass
+
 
         return {'FINISHED'}
 
