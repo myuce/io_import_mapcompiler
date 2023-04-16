@@ -29,11 +29,11 @@ class StandardUV(BaseUV):
     yOffset: float
     rotation: float
 
-    def GetUV(self, vertex: Vector, normal: Vector, texSize: Vector=None) -> Vector:
+    def GetUV(self, vertex: Vector, normal: Vector, texSize: Vector) -> Vector:
         print(self.xScale, self.yScale)
-        du: float = fabs(normal.dot(Vector(0, 0, 1)))
-        dr: float = fabs(normal.dot(Vector(0, 1, 0)))
-        df: float = fabs(normal.dot(Vector(1, 0, 0)))
+        du: float = fabs(normal.dot(Vector((0, 0, 1))))
+        dr: float = fabs(normal.dot(Vector((0, 1, 0))))
+        df: float = fabs(normal.dot(Vector((1, 0, 0))))
 
         uv: Vector = None
         if du >= dr and du >= df:
@@ -47,9 +47,11 @@ class StandardUV(BaseUV):
         uv.x = uv.x * cos(angle) - uv.y * sin(angle)
         uv.y = uv.x * sin(angle) + uv.y * cos(angle)
         
-        uv /= texSize
-        uv /= Vector((self.xScale, self.yScale))
-        uv += Vector((self.xOffset, self.yOffset)) / texSize
+        uv.x /= texSize.x
+        uv.y /= texSize.y
+        uv.x /= self.xScale
+        uv.y /= self.yScale
+        uv += Vector((self.xOffset / texSize.x, self.yOffset / texSize.y))
 
         return uv
     
@@ -71,17 +73,12 @@ class ValveUV(BaseUV):
     vOffset: float
     vScale: float
 
-    def GetUV(self, vertex: Vector, normal: Vector, texSize: Vector=None) -> Vector:
-        if texSize is None:
-            texSize = Vector((512, 512))
+    def GetUV(self, vertex: Vector, normal: Vector, texSize: Vector) -> Vector:
+        return Vector((
+            vertex.dot(self.uAxis) / (texSize.x * self.uScale) + (self.uOffset / texSize.x),
+            vertex.dot(self.vAxis) / (texSize.y * self.vScale) + (self.vOffset / texSize.y))
+        )
 
-        u = vertex.dot(self.uAxis) / (texSize.x * self.uScale) + (self.uOffset / texSize.x),
-        v = vertex.dot(self.vAxis) / (texSize.y * self.vScale) + (self.vOffset / texSize.y)
-
-        print(u, v)
-
-        return Vector((u, v))
-    
     def __str__(self) -> str:
         return f"[ {Vec2Str(self.uAxis)} {self.uOffset:.6g} ] [ {Vec2Str(self.vAxis)} {self.vOffset:.6g} ] 0 {self.uScale:.6g} {self.vScale:.6g} 0 0 0"
 
@@ -114,7 +111,7 @@ class Face:
         self.__center__, self.__normal__, self.__distance__ = None, None, None
         self.vert_idx = []
         self.uv_idx = []
-        self.texSize = Vector((512, 512))
+        self.texSize = Vector((512.0, 512.0))
         self.p1, self.p2, self.p3 = plane
         self.material = material
         self.uvData = uvData
