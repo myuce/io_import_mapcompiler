@@ -149,7 +149,9 @@ class Map:
 
                 elif line.startswith("("):
                     if mode == Mode.Brush:
-                        res.entities[-1].geo[-1].AddFace(Face.FromStr(line))
+                        face = Face.FromStr(line)
+                        res.entities[-1].geo[-1].AddFace(face)
+                        res.AddMaterial(face.material)
                         continue
 
                     elif mode == Mode.Curve:
