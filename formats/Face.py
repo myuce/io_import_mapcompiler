@@ -87,7 +87,7 @@ class Face:
     """
 
     __slots__ = (
-        "p1", "p2", "p3", "material", "uvData", "texSize", "vert_idx", "uv_idx", "lightmapUVs", "lightmapOffset" "parent",
+        "p1", "p2", "p3", "material", "uvData", "texSize", "vert_idx", "uv_idx", "parent",
         "__center__", "__normal__", "__distance__"
     )
 
@@ -99,8 +99,6 @@ class Face:
     texSize: Vector
     vert_idx: List[int]
     uv_idx: List[int]
-    lightmapUVs: List[Vector]
-    lightmapOffset: Vector
     parent: 'Brush'
 
     __center__: Vector
@@ -112,8 +110,6 @@ class Face:
         self.__center__, self.__normal__, self.__distance__ = None, None, None
         self.vert_idx = []
         self.uv_idx = []
-        self.lightmapUVs = []
-        self.lightmapOffset = None
         self.texSize = Vector((512.0, 512.0))
         self.p1, self.p2, self.p3 = plane
         self.material = material
@@ -239,28 +235,6 @@ class Face:
 
         for idx in self.vert_idx:
             self.AddUV(self.uvData.GetUV(self.parent.verts[idx], normal, self.texSize))
-
-    def GetLightmapUV(self, vertex):
-        # it works the same as standard UV, but with a fixed texture size and no rotation or offset
-        normal: Vector = self.GetNormal()
-        scale = 16
-        du: float = fabs(normal.dot(Vector((0, 0, 1))))
-        dr: float = fabs(normal.dot(Vector((0, 1, 0))))
-        df: float = fabs(normal.dot(Vector((1, 0, 0))))
-
-        uv: Vector = None
-        if du >= dr and du >= df:
-            uv = Vector((vertex.x, -vertex.y))
-        elif dr >= du and dr >= df:
-            uv = Vector((vertex.x, -vertex.z))
-        elif df >= du and df >= dr:
-            uv = Vector((vertex.y, -vertex.z))
-
-        return uv * 1024
-
-    def CalculateLightmapUVs(self):
-        for idx in self.vert_idx:
-            self.lightmapUVs.append(self.GetLightmapUV(self.parent.verts[idx]))
 
     def Triangulate(self, return_idx=False) -> List[Tuple[Vector, Vector]]:
         verts = self.vert_idx if return_idx else self.GetVerts()
