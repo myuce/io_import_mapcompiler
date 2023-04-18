@@ -17,7 +17,7 @@ class Mode(Enum):
     Curve = 3
 
 class Map:
-    __slots__ = ("settings", "entities", "materials", "matSizes", "models", "modelMaterials", "modelData", "modelMaterialData")
+    __slots__ = ("settings", "entities", "materials", "matSizes", "models", "modelMaterials", "modelData", "modelMaterialData", "targets", "targetnames")
     settings: dict
     entities: List[Entity]
     materials: List[str]
@@ -26,6 +26,8 @@ class Map:
     modelMaterials: List[str]
     modelData: Dict[str, str]
     modelMaterialData: Dict[str, Any]
+    targets: Dict[str, List[Entity]]
+    targetnames: Dict[str, List[Entity]]
 
     def __init__(self) -> None:
         self.settings = {}
@@ -36,6 +38,8 @@ class Map:
         self.modelMaterials = []
         self.modelData = {}
         self.modelMaterialData = {}
+        self.targets = {}
+        self.targetnames = {}
 
     def __str__(self) -> str:
         res = ""
@@ -64,6 +68,19 @@ class Map:
                 if isinstance(geo, Brush):
                     geo.CalculateVerts()
                     geo.CalculateUVs()
+
+    def AddTarget(self, target, entity):
+        if target not in self.targets:
+            self.targets[target] = []
+        
+        self.targets[target] = entity
+
+
+    def AddTargetName(self, targetname, entity):
+        if targetname not in self.targetnames:
+            self.targetnames[targetname] = []
+        
+        self.targetnames[targetname] = entity
 
     @staticmethod
     def Load(path: str) -> 'Map':
@@ -96,6 +113,7 @@ class Map:
                             material = lines[i + 3].strip()
                             size = tuple([int(i) for i in lines[i + 4].split()[1:3]])
                             res.entities[-1].geo.append(Patch(size, material))
+                            res.AddMaterial(material)
                             continue
 
                     elif mode == Mode.Curve and lines[i - 1].strip() == "patchDef2":
@@ -125,6 +143,11 @@ class Map:
                     if mode == Mode.Entity:
                         key, value = Entity.ParseKVP(line)
                         res.entities[-1][key] = value
+
+                        if key == "targetname":
+                            res.AddTargetName(key, res.entities[-1])
+                        if key == "target":
+                            res.AddTarget(key, res.entities[-1])
                     else:
                         Error('"', i + 1)
 
