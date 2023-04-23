@@ -4,7 +4,7 @@ from math import atan2, cos, fabs, radians, sin, sqrt, pow
 from typing import List, Tuple, Union
 from functools import cmp_to_key
 from numpy.linalg import solve
-from .Helpers import Vec2Str
+from func.Helpers import Vec2Str
 
 class BaseUV:
     def __init__(self) -> None:
@@ -193,6 +193,9 @@ class Face:
         """
         Calculates the center of the brush face.
         """
+
+        if len(self.vert_idx) == 0:
+            return None
         
         if self.__center__ is not None:
             return self.__center__
@@ -216,6 +219,10 @@ class Face:
         """
 
         center: Vector = self.GetCenter()
+
+        if center is None:
+            print(f"Can't find the center of brush {self.p1} {self.p2} {self.p3}. Skipping...")
+
         normal: Vector = self.GetNormal()
 
         def compare(_a: int, _b: int):

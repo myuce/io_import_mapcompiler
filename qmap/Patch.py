@@ -1,7 +1,7 @@
 from mathutils import Vector
 from math import ceil
 import numpy as np
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from .Helpers import Vec2Str
 
 class PatchVert:
@@ -11,6 +11,24 @@ class PatchVert:
 
     def __init__(self, pos: Vector, uv: Vector) -> None:
         self.pos, self.uv = pos, uv
+
+    def __add__(self, rhs: 'PatchVert') -> 'PatchVert':
+        return PatchVert(
+            self.pos + rhs.pos,
+            self.uv + rhs.uv
+        )
+
+    def __mul__(self, rhs: Union['PatchVert', float]) -> 'PatchVert':
+        if isinstance(rhs, PatchVert):
+            return PatchVert(
+                self.pos * rhs.pos,
+                self.uv * rhs.uv
+            )
+        else:
+            return PatchVert(
+                self.pos * rhs,
+                self.uv * rhs
+            )
 
     def __str__(self) -> str:
         return f"( {Vec2Str(self.pos)} {Vec2Str(self.uv)} )"

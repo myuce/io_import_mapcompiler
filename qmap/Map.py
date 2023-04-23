@@ -7,8 +7,7 @@ from .Face import Face
 from .Patch import Patch, PatchVert
 
 def Error(char, line):
-    print(f"Unexpected '{char}' on line {line}. Quitting...")
-    exit()
+    raise Exception(f"Unexpected '{char}' on line {line}. Stopping...")
 
 class Mode(Enum):
     NONE = 0
@@ -73,14 +72,14 @@ class Map:
         if target not in self.targets:
             self.targets[target] = []
         
-        self.targets[target] = entity
+        self.targets[target].append(entity)
 
 
     def AddTargetName(self, targetname, entity):
         if targetname not in self.targetnames:
             self.targetnames[targetname] = []
         
-        self.targetnames[targetname] = entity
+        self.targetnames[targetname].append(entity)
 
     @staticmethod
     def Load(path: str) -> 'Map':
@@ -145,9 +144,9 @@ class Map:
                         res.entities[-1][key] = value
 
                         if key == "targetname":
-                            res.AddTargetName(key, res.entities[-1])
+                            res.AddTargetName(value, res.entities[-1])
                         if key == "target":
-                            res.AddTarget(key, res.entities[-1])
+                            res.AddTarget(value, res.entities[-1])
                     else:
                         Error('"', i + 1)
 
