@@ -2,7 +2,7 @@ from mathutils import Vector
 from math import ceil
 import numpy as np
 from typing import List, Tuple, Union
-from .Helpers import Vec2Str
+from ..func.Helpers import Vec2Str
 
 class PatchVert:
     __slots__ = ("pos", "uv")
