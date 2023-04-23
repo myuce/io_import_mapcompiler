@@ -163,12 +163,8 @@ class ImportMap(Operator, ImportHelper):
             # Create a diffuse node and an output node
             diffuse_node = nodes.new(type="ShaderNodeBsdfDiffuse")
             output_node = nodes.new(type="ShaderNodeOutputMaterial")
-
-            # Connect the nodes together
             links = material.node_tree.links
-            links.new(tex_node.outputs["Color"], mix_shader_node.inputs[1])
-            links.new(lightmap_node.outputs["Color"], mix_shader_node.inputs[2])
-            links.new(mix_shader_node.outputs["Shader"], diffuse_node.inputs["Surface"])
+            links.new(tex_node.outputs["Color"], diffuse_node.inputs["Color"])
             links.new(diffuse_node.outputs["BSDF"], output_node.inputs["Surface"])
 
         for i, entity in enumerate(mapData.entities):
