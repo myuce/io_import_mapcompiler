@@ -7,6 +7,7 @@ from .builders.MaterialBuilder import BuildMaterials
 from .builders.BrushBuilder import BuildBrushGeo
 from .builders.PatchBuilder import BuildPatchGeo
 from .builders.LightBuilder import BuildLight
+from .builders.LmapBuilder import BuildLightmapUVs
 
 bl_info = {
     "name": "mapcompiler",
@@ -61,6 +62,8 @@ class ImportMap(Operator, ImportHelper):
                         BuildBrushGeo(geo, i, j)
                     elif isinstance(geo, Patch):
                         BuildPatchGeo(geo, i, j, self.patch_tessellation)
+
+        BuildLightmapUVs()
 
         return {'FINISHED'}
 
