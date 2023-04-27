@@ -1,3 +1,4 @@
+import bpy
 from mathutils import Vector
 from copy import copy
 from math import atan2, cos, fabs, radians, sin, sqrt, pow
@@ -87,7 +88,7 @@ class Face:
     """
 
     __slots__ = (
-        "p1", "p2", "p3", "material", "uvData", "texSize", "vert_idx", "uv_idx", "parent",
+        "p1", "p2", "p3", "material", "uvData", "texSize", "vert_idx", "uv_idx", "parent", "bpy_obj"
         "__center__", "__normal__", "__distance__"
     )
 
@@ -100,6 +101,7 @@ class Face:
     vert_idx: List[int]
     uv_idx: List[int]
     parent: 'Brush'
+    bpy_obj: bpy.types.Object
 
     __center__: Vector
     __normal__: Vector
@@ -115,6 +117,7 @@ class Face:
         self.material = material
         self.uvData = uvData
         self.parent = None
+        self.bpy_obj = None
 
         __center__ = None
         __normal__ = None

@@ -1,3 +1,4 @@
+import bpy
 from mathutils import Vector
 from math import ceil
 import numpy as np
@@ -48,15 +49,19 @@ class PatchVert:
         return res
 
 class Patch:
-    __slots__ = ("size", "material", "verts")
+    __slots__ = ("size", "material", "verts", "calculatedVerts" "bpy_obj")
     size: Tuple[int, int]
     material: str
     verts: List[List[PatchVert]]
+    calculatedVerts: List[List[PatchVert]]
+    bpy_obj: bpy.types.Object
 
     def __init__(self, size: Tuple[int, int], material: str) -> None:
         self.size = size
         self.material = material
         self.verts = []
+        self.calculatedVerts = None
+        self.bpy_obj = None
 
     def __str__(self) -> str:
         res = "{\n"
