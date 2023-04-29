@@ -93,3 +93,35 @@ class Patch:
             res.append(row)
 
         return res
+
+    def Slice(self) -> List[List['Patch']]:
+        if self.size == (3, 3):
+            return [self]
+
+        res: List[List['Patch']] = []
+        for i in range(1, self.size[0], 2):
+            row = []
+            for j in range(1, self.size[1], 2):
+                col = Patch((3, 3), self.material)
+                col.verts = [
+                    [
+                        self.verts[i - 1][j - 1],
+                        self.verts[i - 1][j],
+                        self.verts[i - 1][j + 1],
+                    ],
+                    [
+                        self.verts[i][j - 1],
+                        self.verts[i][j],
+                        self.verts[i][j + 1],
+                    ],
+                    [
+                        self.verts[i + 1][j - 1],
+                        self.verts[i + 1][j],
+                        self.verts[i + 1][j + 1],
+                    ],
+                ]
+                row.append(col)
+
+            res.append(row)
+
+        return res
