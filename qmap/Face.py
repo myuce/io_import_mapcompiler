@@ -88,7 +88,7 @@ class Face:
     """
 
     __slots__ = (
-        "p1", "p2", "p3", "material", "uvData", "texSize", "vert_idx", "uv_idx", "parent", "bpy_obj"
+        "p1", "p2", "p3", "material", "uvData", "texSize", "vert_idx", "uv_idx", "parent", "bpy_obj",
         "__center__", "__normal__", "__distance__"
     )
 
@@ -108,8 +108,6 @@ class Face:
     __distance__: float
 
     def __init__(self, plane: Tuple[Vector, Vector, Vector], material: str, uvData: Union[StandardUV, ValveUV]) -> None:
-        super().__init__()
-        self.__center__, self.__normal__, self.__distance__ = None, None, None
         self.vert_idx = []
         self.uv_idx = []
         self.texSize = Vector((512.0, 512.0))
@@ -119,9 +117,9 @@ class Face:
         self.parent = None
         self.bpy_obj = None
 
-        __center__ = None
-        __normal__ = None
-        __distance__ = None
+        self.__center__ = None
+        self.__normal__ = None
+        self.__distance__ = None
 
     def __str__(self) -> str:
         return f"( {Vec2Str(self.p1)} ) ( {Vec2Str(self.p2)} ) ( {Vec2Str(self.p3)} ) {self.material} {self.uvData}"

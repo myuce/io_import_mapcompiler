@@ -49,7 +49,7 @@ class PatchVert:
         return res
 
 class Patch:
-    __slots__ = ("size", "material", "verts", "calculatedVerts" "bpy_obj")
+    __slots__ = ("size", "material", "verts", "calculatedVerts", "bpy_obj")
     size: Tuple[int, int]
     material: str
     verts: List[List[PatchVert]]
@@ -80,36 +80,16 @@ class Patch:
 
         return res
 
-    def Slice(self, maxSize: int=16) -> List['Patch']:
-        if self.size[0] <= maxSize and self.size[1] <= maxSize:
-            return [self]
-        
-        res: List['Patch'] = []
+    def Slice(self) -> List[List[List[List[PatchVert]]]]:
+        res: List[List[List[List[PatchVert]]]] = []
 
-        # create a 2d numpy array of vertices
-        arr: np.ndarray = np.array(self.verts)
+        for i in range(0, self.size[0], 3):
+            row: List['Patch'] = []
 
-        # slice the 2d array into smaller 2d arrays
-        numvert = ceil((len(arr) - 1) / (maxSize - 1))
-        numhorz = ceil((len(arr[0]) - 1) / (maxSize - 1))
+            for j in range(0, self.size[1], 3):
+                patch_size = (min(3, self.size[0] - i), min(3, self.size[1] - j))
+                row.append([self.verts[i + x][j:j+patch_size[1]] for x in range(patch_size[0])])
 
-        for i in range(numvert):
-            for j in range(numhorz):
-                startvert = i * (maxSize - 1)
-                endvert = (i + 1) * (maxSize - 1) + 1
-                starthorz = j * (maxSize - 1)
-                endhorz = (j + 1) * (maxSize - 1) + 1
-
-                if endvert > len(arr):
-                    endvert = len(arr)
-                if endhorz > len(arr[0]):
-                    endhorz = len(arr[0])
-                
-                newarr = arr[startvert:endvert, starthorz:endhorz].tolist()
-
-                newPatch = Patch((len(newarr), len(newarr[0])), self.material)
-                newPatch.verts = newarr
-                res.append(newPatch)
+            res.append(row)
 
         return res
-
