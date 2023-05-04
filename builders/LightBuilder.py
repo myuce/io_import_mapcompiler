@@ -27,6 +27,8 @@ def BuildLight(light: Entity, entity: int, mapData: Map):
             light_obj.data.color = color
             light_obj.data.shadow_soft_size = (energy * pi) * 0.0254
             light_obj.data.energy = energy * 10
+    
+            bpy.context.scene.collection.objects.link(light_obj)
 
     else:
         light_data = bpy.data.lights.new(name=f"ent_{entity}_data", type='POINT')
@@ -37,4 +39,4 @@ def BuildLight(light: Entity, entity: int, mapData: Map):
         light_obj.data.shadow_soft_size = (energy * pi) * 0.0254
         light_obj.data.energy = energy * 10
 
-    bpy.context.scene.collection.objects.link(light_obj)
+        bpy.context.scene.collection.objects.link(light_obj)
