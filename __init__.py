@@ -61,7 +61,8 @@ class ImportMap(Operator, ImportHelper):
                     if isinstance(geo, Brush):
                         BuildBrushGeo(geo, i, j)
                     elif isinstance(geo, Patch):
-                        BuildPatchGeo(geo, i, j, self.patch_tessellation)
+                        print("Patch mesghes are not supported")
+                        # BuildPatchGeo(geo, i, j, self.patch_tessellation)
 
         BuildLightmapUVs()
 
