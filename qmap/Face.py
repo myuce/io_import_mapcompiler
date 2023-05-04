@@ -88,7 +88,7 @@ class Face:
     """
 
     __slots__ = (
-        "p1", "p2", "p3", "material", "uvData", "texSize", "vert_idx", "uv_idx", "parent", "bpy_obj",
+        "p1", "p2", "p3", "material", "uvData", "texSize", "vert_idx", "uv_idx", "lm", "parent", "bpy_mesh",
         "__center__", "__normal__", "__distance__"
     )
 
@@ -100,8 +100,8 @@ class Face:
     texSize: Vector
     vert_idx: List[int]
     uv_idx: List[int]
+    lm: List[Vector]
     parent: 'Brush'
-    bpy_obj: bpy.types.Object
 
     __center__: Vector
     __normal__: Vector
@@ -110,12 +110,12 @@ class Face:
     def __init__(self, plane: Tuple[Vector, Vector, Vector], material: str, uvData: Union[StandardUV, ValveUV]) -> None:
         self.vert_idx = []
         self.uv_idx = []
+        self.lm = []
         self.texSize = Vector((512.0, 512.0))
         self.p1, self.p2, self.p3 = plane
         self.material = material
         self.uvData = uvData
         self.parent = None
-        self.bpy_obj = None
 
         self.__center__ = None
         self.__normal__ = None

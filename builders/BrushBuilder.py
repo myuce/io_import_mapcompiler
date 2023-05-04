@@ -44,5 +44,4 @@ def BuildBrushGeo(brush: Brush, entity: int, brushID: int):
         
         bpy.context.scene.collection.objects.link(mesh_obj)
 
-        # attach bpy object to the face object to access important data later
-        face.bpy_obj = mesh_obj
+        face.lm = mesh_data.uv_layers["LightmapUV"].data
