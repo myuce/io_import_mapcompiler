@@ -35,11 +35,11 @@ def tesselatePatch(controlPoints, tessellationLevel):
     
     return vertices
 
-def create_mesh(patch_data: Patch, entity: int, patchID: int, patchNum: int, tessellationLevel: int):
+def create_mesh(patch_data: Patch, entity: int, patchID: int, patchNum: int, tessellationLevel: int, material: str):
     vertices = []
     triangles = []
     # tesselate the patch and create vertices and indices
-    vertices = tesselatePatch(patch_data.verts, tessellationLevel)
+    vertices = tesselatePatch(patch_data, tessellationLevel)
 
     for y in range(tessellationLevel):
         for x in range(tessellationLevel):
@@ -67,15 +67,22 @@ def create_mesh(patch_data: Patch, entity: int, patchID: int, patchNum: int, tes
         vertex_index = loop.vertex_index
         uv_layer.data[loop_index].uv = vertices[vertex_index].uv
     mesh.update()
-    matName = newPath(patch_data.material)
+    matName = newPath(material)
     if matName in bpy.data.materials:
-        material = bpy.data.materials[newPath(patch_data.material)]
+        material = bpy.data.materials[matName]
         obj.data.materials.append(material)
     return obj
 
 def BuildPatchGeo(patchData: Patch, entity: int, patchID: int, tessellationLevel: int):
     # slice patch into smaller 3x3 patches
-    patches = patchData.Slice(3)
-
-    for i, patch in enumerate(patches):
-        create_mesh(patch, entity, patchID, i, tessellationLevel)
+    patches = patchData.Slice()
+    patchObjs = []
+    for i, row in enumerate(patches):
+        for j, patch in enumerate(row):
+            obj = create_mesh(patch, entity, patchID, (i * len(row)) + j, tessellationLevel, patchData.material)
+            obj.select_set(True)
+    
+    bpy.context.view_layer.objects.active = bpy.context.selected_objects[0]
+    bpy.ops.object.join()
+    bpy.context.selected_objects[0].name = f"ent_{entity}_patch_{patchID}"
+    bpy.ops.object.select_all(action="DESELECT")

@@ -6,12 +6,13 @@ from typing import List, Tuple, Union
 from ..func.Helpers import Vec2Str
 
 class PatchVert:
-    __slots__ = ("pos", "uv")
+    __slots__ = ("pos", "uv", "lm")
     pos: Vector
     uv: Vector
+    lm: Vector
 
     def __init__(self, pos: Vector, uv: Vector) -> None:
-        self.pos, self.uv = pos, uv
+        self.pos, self.uv, self.lm = pos, uv, None
 
     def __add__(self, rhs: 'PatchVert') -> 'PatchVert':
         return PatchVert(
@@ -81,29 +82,17 @@ class Patch:
         return res
 
     def Slice(self) -> List[List[List[List[PatchVert]]]]:
-        res: List[List[List[List[PatchVert]]]] = []
-
-        for i in range(0, self.size[0], 3):
-            row: List['Patch'] = []
-
-            for j in range(0, self.size[1], 3):
-                patch_size = (min(3, self.size[0] - i), min(3, self.size[1] - j))
-                row.append([self.verts[i + x][j:j+patch_size[1]] for x in range(patch_size[0])])
-
-            res.append(row)
-
-        return res
-
-    def Slice(self) -> List[List['Patch']]:
+        """
+        Slice the patch into a 2d list of 3x3 patches to tessellate them later
+        """
         if self.size == (3, 3):
-            return [self]
+            return [[self.verts]]
 
-        res: List[List['Patch']] = []
+        res: List[List[List[List[PatchVert]]]] = []
         for i in range(1, self.size[0], 2):
             row = []
             for j in range(1, self.size[1], 2):
-                col = Patch((3, 3), self.material)
-                col.verts = [
+                col = [
                     [
                         self.verts[i - 1][j - 1],
                         self.verts[i - 1][j],
