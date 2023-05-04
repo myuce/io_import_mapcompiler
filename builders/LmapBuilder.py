@@ -13,3 +13,9 @@ def BuildLightmapUVs() -> None:
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.uv.lightmap_pack(PREF_IMG_PX_SIZE=1024)
     bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.select_all(action="DESELECT")
+
+def CreateLightmapImage(width, height) -> None:
+    image = bpy.data.images.new(name="WhiteImage", width=width, height=height)
+    pixels = [1.0] * (width * height * 4)
+    image.pixels = pixels
