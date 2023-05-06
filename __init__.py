@@ -7,7 +7,7 @@ from .builders.MaterialBuilder import BuildMaterials
 from .builders.BrushBuilder import BuildBrushGeo
 from .builders.PatchBuilder import BuildPatchGeo
 from .builders.LightBuilder import BuildLight
-from .builders.LmapBuilder import BuildLightmapUVs
+from .builders.LmapBuilder import BuildLightmapUVs, BakeLightmap, GetLightmapPixels
 
 bl_info = {
     "name": "mapcompiler",
@@ -44,6 +44,11 @@ class ImportMap(Operator, ImportHelper):
         default=8
     )
 
+    bake_lightmaps: BoolProperty(
+        name="Bake Lightmaps",
+        default=False
+    )
+
     def execute(self, context):
         mapData = Map.Load(self.filepath)
 
@@ -61,10 +66,13 @@ class ImportMap(Operator, ImportHelper):
                     if isinstance(geo, Brush):
                         BuildBrushGeo(geo, i, j)
                     elif isinstance(geo, Patch):
-                        print("Patch mesghes are not supported")
+                        continue
                         # BuildPatchGeo(geo, i, j, self.patch_tessellation)
 
         BuildLightmapUVs()
+        if self.bake_lightmaps:
+            BakeLightmap()
+            LightmapPixels = GetLightmapPixels()
 
         return {'FINISHED'}
 
