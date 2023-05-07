@@ -8,6 +8,7 @@ from .builders.BrushBuilder import BuildBrushGeo
 from .builders.PatchBuilder import BuildPatchGeo
 from .builders.LightBuilder import BuildLight
 from .builders.LmapBuilder import BuildLightmapUVs, BakeLightmap, GetLightmapPixels
+from .builders.OctreeBuilder import BuildeOctree
 
 bl_info = {
     "name": "mapcompiler",
@@ -49,6 +50,22 @@ class ImportMap(Operator, ImportHelper):
         default=False
     )
 
+    lightmap_size: EnumProperty(
+        name="Lightmap Image Size",
+        default=False,
+        items=(
+            ('512', "512x512", "512x512"),
+            ('1024', "1024x1024", "1024x1024"),
+            ('2048', "2048x2048", "2048x2048"),
+            ('4096', "4096x4096", "4096x4096")
+        )
+    )
+
+    save_level: BoolProperty(
+        name="Compile",
+        default=False
+    )
+
     def execute(self, context):
         mapData = Map.Load(self.filepath)
 
@@ -69,7 +86,7 @@ class ImportMap(Operator, ImportHelper):
                         continue
                         # BuildPatchGeo(geo, i, j, self.patch_tessellation)
 
-        BuildLightmapUVs()
+        BuildLightmapUVs(self.lightmap_size)
         if self.bake_lightmaps:
             BakeLightmap()
             LightmapPixels = GetLightmapPixels()
