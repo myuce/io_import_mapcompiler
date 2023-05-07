@@ -1,6 +1,6 @@
 import bpy
 
-def BuildLightmapUVs() -> None:
+def BuildLightmapUVs(lightmap_size: int=1024) -> None:
     # deselect all the objects first
     bpy.ops.object.select_all(action="DESELECT")
 
@@ -11,7 +11,7 @@ def BuildLightmapUVs() -> None:
 
     bpy.context.view_layer.objects.active = bpy.context.selected_objects[0]
     bpy.ops.object.mode_set(mode='EDIT')
-    bpy.ops.uv.lightmap_pack(PREF_IMG_PX_SIZE=1024)
+    bpy.ops.uv.lightmap_pack(PREF_IMG_PX_SIZE=lightmap_size, PREF_MARGIN_DIV=1.0, PREF_PACK_IN_ONE=True)
     bpy.ops.object.mode_set(mode='OBJECT')
 
 def CreateLightmapImage(width, height) -> None:
@@ -22,9 +22,10 @@ def CreateLightmapImage(width, height) -> None:
 
 def BakeLightmap():
     bpy.data.scenes["Scene"].render.engine = "CYCLES"
-    bpy.context.scene.cycles.device = 'GPU'
+    bpy.context.scene.cycles.device = 'CPU'
     bpy.context.scene.cycles.bake_type = 'DIFFUSE'
-    bpy.context.scene.cycles.samples = 512
+    bpy.context.scene.cycles.samples = 64
+    bpy.context.scene.cycles.margin = 1
     bpy.context.scene.render.bake.use_pass_direct = True
     bpy.context.scene.render.bake.use_pass_indirect = True
     bpy.context.scene.render.bake.use_pass_color = False
