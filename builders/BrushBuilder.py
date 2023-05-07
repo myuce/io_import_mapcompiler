@@ -6,7 +6,7 @@ from ..func.Helpers import newPath
 
 def BuildBrushGeo(brush: Brush, entity: int, brushID: int):
     brush.CalculateVerts()
-
+    default_material = bpy.data.materials["404"]
     for i, face in enumerate(brush.faces):
         if face.material.startswith("common/"):
             continue
@@ -31,6 +31,9 @@ def BuildBrushGeo(brush: Brush, entity: int, brushID: int):
             material = bpy.data.materials[newPath(face.material)]
             mesh_obj.data.materials.append(material)
             face.texSize = Vector(material.node_tree.nodes["Image Texture"].image.size)
+        else:
+            material = default_material
+            mesh_obj.data.materials.append(material)
 
         face.CalculateUVs()
         uvs = [Vector((uv.x, -uv.y)) for uv in face.GetUVs()]
