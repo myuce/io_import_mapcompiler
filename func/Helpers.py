@@ -24,3 +24,17 @@ def newPath(path: str, shorten=False, prefix=""):
         fileName = shortenName(fileName)
     dirName = dirname(path)
     return f"{shortenPath(dirName)}_{fileName}"
+
+def VecMin(v1: Vector, v2: Vector):
+    return Vector((
+        min(v1.x, v2.x),
+        min(v1.y, v2.y),
+        min(v1.z, v2.z),
+    ))
+
+def VecMax(v1: Vector, v2: Vector):
+    return Vector((
+        max(v1.x, v2.x),
+        max(v1.y, v2.y),
+        max(v1.z, v2.z),
+    ))

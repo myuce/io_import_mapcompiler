@@ -1,7 +1,7 @@
 from mathutils import Vector, geometry
-from typing import List
+from typing import List, Tuple
 from math import isnan
-
+from ..func.Helpers import VecMin, VecMax
 def GetPlaneIntersectionPoint(face1: 'Face', face2: 'Face', face3: 'Face') -> Vector:
     """
     Calculates the intersecion points of three planes in 3D space.
@@ -18,23 +18,29 @@ def GetPlaneIntersectionPoint(face1: 'Face', face2: 'Face', face3: 'Face') -> Ve
 
 class Brush:
     """ Base class that holds all the necessary properties and methods used by a brush. """
-    __slots__ = ("faces", "verts", "uvs")
+    __slots__ = ("id", "faces", "verts", "uvs", "__boundingBox__")
 
+    id: Tuple[int, int]
     faces: List['Face']
     verts: List[Vector]
     uvs: List[Vector]
 
-    def __init__(self, faces: List['Face']=None) -> None:
-        self.faces = [] if faces is None else faces
+    __boundingBox__: Tuple[Vector, Vector]
+
+    def __init__(self, brushID: int, entityID: int) -> None:
+        self.id = (entityID, brushID)
+        self.faces = []
         self.verts = []
         self.uvs = []
 
+        self.__boundingBox__ = None
+
     def __str__(self) -> str:
         res = "{\n"
-        
+
         for face in self.faces:
             res += str(face) + "\n"
-        
+
         res += "}\n"
 
         return res
@@ -47,16 +53,16 @@ class Brush:
         for v in self.verts:
             if v == vert:
                 return
-        
+
         self.verts.append(vert)
-    
+
     def AddUV(self, uv: Vector) -> None:
         for _uv in self.uvs:
             if uv == _uv:
                 return
-        
+
         self.uvs.append(uv)
-    
+
     def IsVertLegal(self, vert: Vector) -> bool:
         """
         Checks if a point in space is a part of the brush.
@@ -86,13 +92,13 @@ class Brush:
                 for j, face3 in enumerate(self.faces):
                     if i == k or i == j or k == j: # skip comparing faces to themselves
                         continue
-                        
+
                     intersection: Vector = GetPlaneIntersectionPoint(face1, face2, face3)
 
                     # make sure the intersection point is inside the brush
                     if intersection is None or not self.IsVertLegal(intersection):
                         continue
-                    
+
                     self.AddVert(intersection)
                     face1.AddVert(intersection)
                     face2.AddVert(intersection)
@@ -110,6 +116,19 @@ class Brush:
 
         for face in self.faces:
             face.CalculateUVs()
+
+    def GetBoundingBox(self) -> Tuple[Vector, Vector]:
+        if self.__boundingBox__ is not None:
+            return self.__boundingBox__
+
+        brush_min, brush_max = self.verts[0], self.verts[0]
+        
+        for vert in self.verts[1:]:
+            brush_min = VecMin(vert, brush_min)
+            brush_max = VecMax(vert, brush_max)
+
+        self.__boundingBox__ = brush_min, brush_max
+        return brush_min, brush_max
 
 from .Face import Face
 

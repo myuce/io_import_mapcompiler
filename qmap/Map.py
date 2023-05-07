@@ -98,13 +98,13 @@ class Map:
                 elif line == "{":
                     if mode == Mode.NONE:
                         mode = Mode.Entity
-                        res.entities.append(Entity({}))
+                        res.entities.append(Entity(len(res.entities)))
                         continue
 
                     elif mode == Mode.Entity:
                         if lines[i + 1].startswith("("):
                             mode = Mode.Brush
-                            res.entities[-1].geo.append(Brush([]))
+                            res.entities[-1].geo.append(Brush(len(res.entities[-1].geo)))
                             continue
 
                         elif lines[i + 1].strip() == "patchDef2":

@@ -4,13 +4,16 @@ from .Patch import Patch
 
 class Entity:
     """ Base class that has all the properties and methods used by a map entity. """
-    __slots__ = ("properties", "geo")
+    __slots__ = ("id", "properties", "geo", "boundingBox")
     properties: Dict[str, str]
     geo: List[Union[Brush, Patch]]
 
-    def __init__(self, properties: dict=None) -> None:
-        self.properties = {} if properties is None else properties
+    def __init__(self, id: int) -> None:
+        id: int
+        self.id = id
+        self.properties = {}
         self.geo = []
+        self.boundingBox = None
 
     def __str__(self) -> str:
         res = "{\n"
