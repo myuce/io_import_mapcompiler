@@ -7,8 +7,8 @@ from .builders.MaterialBuilder import BuildMaterials
 from .builders.BrushBuilder import BuildBrushGeo
 from .builders.PatchBuilder import BuildPatchGeo
 from .builders.LightBuilder import BuildLight
-from .builders.LmapBuilder import BuildLightmapUVs, BakeLightmap, GetLightmapPixels
-from .builders.OctreeBuilder import BuildeOctree
+from .builders.LmapBuilder import BuildLightmapUVs, BakeLightmap
+from .builders.LevelBuilder import BuildLevel
 
 bl_info = {
     "name": "mapcompiler",
@@ -51,14 +51,14 @@ class ImportMap(Operator, ImportHelper):
     )
 
     lightmap_size: EnumProperty(
-        name="Lightmap Image Size",
-        default=False,
         items=(
-            ('512', "512x512", "512x512"),
-            ('1024', "1024x1024", "1024x1024"),
-            ('2048', "2048x2048", "2048x2048"),
-            ('4096', "4096x4096", "4096x4096")
-        )
+            ("512", "512x512", "512x512"),
+            ("1024", "1024x1024", "1024x1024"),
+            ("2048", "2048x2048", "2048x2048"),
+            ("4096", "4096x4096", "4096x4096")
+        ),
+        name="Lightmap Image Size",
+        default="1024"
     )
 
     save_level: BoolProperty(
@@ -86,10 +86,13 @@ class ImportMap(Operator, ImportHelper):
                         continue
                         # BuildPatchGeo(geo, i, j, self.patch_tessellation)
 
-        BuildLightmapUVs(self.lightmap_size)
+        BuildLightmapUVs(int(self.lightmap_size))
+
         if self.bake_lightmaps:
             BakeLightmap()
-            LightmapPixels = GetLightmapPixels()
+        
+        if self.save_level:
+            BuildLevel(self.filepath, mapData)
 
         return {'FINISHED'}
 
