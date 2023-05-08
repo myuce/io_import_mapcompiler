@@ -8,6 +8,12 @@ def GetMapBoundingBox(map: Map) -> AABB:
     map_min, map_max = map.entities[0].geo[0].verts[0], map.entities[0].geo[0].verts[0]
 
     for entity in map.entities:
+        if entity.boundingBox is not None:
+            ent_min, ent_max = entity.boundingBox
+            map_min = VecMin(ent_min, map_min)
+            map_max = VecMax(ent_max, map_max)
+            continue
+
         for geo in entity.geo:
             geo_min, geo_max = geo.GetBoundingBox()
             map_min = VecMin(geo_min, map_min)

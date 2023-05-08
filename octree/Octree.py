@@ -12,7 +12,7 @@ class Node:
 
     boundingBox: AABB
     parent: 'Node'
-    objects: List[Tuple[int, ...]]
+    objects: List[Union[int, Tuple[int, int]]]
     children: List['Node']
 
     def __init__(self, boundingBox, parent=True):
