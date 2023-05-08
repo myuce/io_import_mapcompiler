@@ -47,4 +47,4 @@ def BuildBrushGeo(brush: Brush, entity: int, brushID: int):
         
         bpy.context.scene.collection.objects.link(mesh_obj)
 
-        face.lm = mesh_data.uv_layers["LightmapUV"].data
+        face.lm = [lm.uv for lm in mesh_data.uv_layers["LightmapUV"].data]

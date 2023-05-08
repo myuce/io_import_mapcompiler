@@ -40,6 +40,7 @@ def CreateDefaultMaterial():
 
 def BuildMaterials(mapData: Map, game_path: str, lightmapImageSize=(1024, 1024)):
     lightmapImage = CreateLightmapImage(*lightmapImageSize)
+    CreateDefaultMaterial()
 
     extensions = ["tga", "jpg", "png"]
 

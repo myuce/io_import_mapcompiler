@@ -34,12 +34,8 @@ def BakeLightmap():
 
     bpy.ops.object.select_all(action="DESELECT")
 
-def GetLightmapPixels():
+def GetLightmapData():
     image = bpy.data.images["LightmapImage"]
-    pixels = []
-    for i in range(0, len(image.pixels), 4):
-        pixels.append(int(image.pixels[i] * 255))
-        pixels.append(int(image.pixels[i] * 255))
-        pixels.append(int(image.pixels[i] * 255))
+    pixels = bytearray([int(p * 255) for i, p in enumerate(image.pixels) if (i + 1) % 4 != 0])
     
-    return pixels
+    return image, pixels
