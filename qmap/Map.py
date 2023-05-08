@@ -104,7 +104,7 @@ class Map:
                     elif mode == Mode.Entity:
                         if lines[i + 1].startswith("("):
                             mode = Mode.Brush
-                            res.entities[-1].geo.append(Brush(len(res.entities[-1].geo)))
+                            res.entities[-1].geo.append(Brush(len(res.entities[-1].geo), res.entities[-1].id))
                             continue
 
                         elif lines[i + 1].strip() == "patchDef2":

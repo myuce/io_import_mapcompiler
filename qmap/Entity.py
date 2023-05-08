@@ -1,4 +1,5 @@
-from typing import List, Dict, Union
+from mathutils import Vector
+from typing import List, Dict, Tuple, Union
 from .Brush import Brush
 from .Patch import Patch
 
@@ -7,6 +8,7 @@ class Entity:
     __slots__ = ("id", "properties", "geo", "boundingBox")
     properties: Dict[str, str]
     geo: List[Union[Brush, Patch]]
+    boundingBox: Tuple[Vector, Vector]
 
     def __init__(self, id: int) -> None:
         id: int
