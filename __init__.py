@@ -71,7 +71,8 @@ class ImportMap(Operator, ImportHelper):
     def execute(self, context):
         mapData = Map.Load(self.filepath)
 
-        BuildMaterials(mapData, self.game_path)
+        lighmap_size = (int(self.lightmap_size), int(self.lightmap_size))
+        BuildMaterials(mapData, self.game_path, lighmap_size)
 
         for i, entity in enumerate(mapData.entities):
             classname = entity["classname"]
@@ -88,7 +89,7 @@ class ImportMap(Operator, ImportHelper):
                         continue
                         # BuildPatchGeo(geo, i, j, self.patch_tessellation)
 
-        BuildLightmapUVs(int(self.lightmap_size))
+        BuildLightmapUVs(lighmap_size)
 
         if self.bake_lightmaps:
             BakeLightmap()
